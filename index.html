@@ -66,7 +66,7 @@ body {
       <div class="jumbotron rightimage">
         <h1>Chaotic Pendulum</h1>
         <p>This demo is a quick exercise to illustrate how the we can simulate <br />a <a href='http://en.wikipedia.org/wiki/Dynamical_systems'>dynamic</a>, <a href='http://en.wikipedia.org/wiki/Chaos_theory'>chaotic</a> physics system using Web Based technologies. </p>
-        <p>To see the difference between static and fixed top navbars, just scroll.</p>
+        <p>To start the simulation just drag one of the circles.</p>
         <p>
           <a class="btn btn-lg btn-primary" href="http://en.wikipedia.org/wiki/Double_pendulum" role="button">View Wikipedia article &raquo;</a>
         </p>
@@ -78,17 +78,93 @@ body {
          <canvas id="canvas" width="400" height="400" style="background-color:#333333;" ></canvas> 
         </div>
 
-        <div class="col-md-8">
+        <div class="col-md-8" id="body">
 
-          <div id="example2a">
-          </div>
+          <div id="example2a"></div>
+<style>
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
-        <!--          
-            <canvas width="300" height="60"></canvas>
-            <span class="title">Area (120px)</span>
-            <span class="value" style="">−8.8</span>
-        --> 
-        
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var parseDate = d3.time.format("%d-%b-%y").parse;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+var svg = d3.select("#example2a").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.date = parseDate(d.date);
+    d.close = +d.close;
+  });
+
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain(d3.extent(data, function(d) { return d.close; }));
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Price ($)");
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line);
+});
+
+</script>
         </div>
       </div>
 
@@ -111,11 +187,10 @@ body {
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script> -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/Box2dWeb-2.1.a.3.min.js"></script>
-    <script src="js/d3.v2.js"></script>
-    <script src="js/cubism.v1.js"></script>
-    
-    <script type="text/javascript">
-
+<script src="js/d3.v2.js"></script>
+<script src="js/cubism.v1.js"></script>
+<script>
+/*
 function random(name) {
   var value = 0,
       values = [],
@@ -132,29 +207,48 @@ function random(name) {
     callback(null, values = values.slice((start - stop) / step));
   }, name);
 }
+*/
+</script>
+<script>
 
-    var context = cubism.context()
+/*
+var context = cubism.context()
     .serverDelay(0)
     .clientDelay(0)
     .step(1e3)
     .size(960);
 
-    var foo = random("foo"),
-        bar = random("bar");
+var foo = random("foo"),
+    bar = random("bar");
 
-    d3.select("#example2a").call(function(div) {
-      div.datum(foo);
+d3.select("#example2a").call(function(div) {
+  div.datum(foo);
 
-      div.append("div")
-          .attr("class", "horizon")
-          .call(context.horizon()
-            .height(120)
-            .mode("mirror")
-            .colors(["#bdd7e7","#bae4b3"])
-            .title("Area (120px)")
-            .extent([-10, 10]));
-    });
-    </script>
+  div.append("div")
+      .attr("class", "horizon")
+      .call(context.horizon()
+        .height(120)
+        .mode("mirror")
+        .colors(["#bdd7e7","#bae4b3"])
+        .title("Area (120px)")
+        .extent([-10, 10]));
+
+  div.append("div")
+      .attr("class", "horizon")
+      .call(context.horizon()
+        .height(30)
+        .mode("mirror")
+        .colors(["#bdd7e7","#bae4b3"])
+        .title("Area (30px)")
+        .extent([-10, 10]));
+});
+
+// On mousemove, reposition the chart values to match the rule.
+context.on("focus", function(i) {
+  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+});
+*/
+   </script> 
     <script type="text/javascript">
           
     function init() {
