@@ -1,257 +1,384 @@
-<html>
-   <head>
-      <title>Double Pendulum Demo</title>
-   </head>
-   <body onload="init();">
-   <table>
-     <tr>
-     <td>
-      <canvas id="canvas" width="400" height="400" style="background-color:#333333;" ></canvas>
-     </td>
-     <td valign="bottom">
-      <label><input type="checkbox" onchange="debugging=this.checked;" />Debug?</label><br />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Double Pendulum</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+  </head>
+
+<style type="text/css">
+body {
+  padding-top: 70px;
+}
+.rightimage {
+	/*
+  -khtml-opacity:.50; 
+  -moz-opacity:.50; 
+  -ms-filter:"alpha(opacity=50)";
+  filter:alpha(opacity=50);
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
+  */
+  opacity: 0.95;
+  background-image: url('images/pendulum3.png');
+  background-repeat:no-repeat;
+  background-position:top right;
+  background-size: Auto 100%;
+}
+</style>
+
+  <body onload="init();">
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Pendulum demo</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#demo">Demo</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron rightimage">
+        <h1>Chaotic Pendulum</h1>
+        <p>This demo is a quick exercise to illustrate how the we can simulate <br />a <a href='http://en.wikipedia.org/wiki/Dynamical_systems'>dynamic</a>, <a href='http://en.wikipedia.org/wiki/Chaos_theory'>chaotic</a> physics system using Web Based technologies. </p>
+        <p>To see the difference between static and fixed top navbars, just scroll.</p>
+        <p>
+          <a class="btn btn-lg btn-primary" href="http://en.wikipedia.org/wiki/Double_pendulum" role="button">View Wikipedia article &raquo;</a>
+        </p>
+      </div>
+
+      <a name="demo"></a>
+      <div class="row">
+        <div class="col-md-4">
+         <canvas id="canvas" width="400" height="400" style="background-color:#333333;" ></canvas> 
+        </div>
+
+        <div class="col-md-8">
+
+          <div id="example2a">
+          </div>
+
+        <!--          
+            <canvas width="300" height="60"></canvas>
+            <span class="title">Area (120px)</span>
+            <span class="value" style="">−8.8</span>
+        --> 
+        
+        </div>
+      </div>
+
+      <label>
+        <input type="checkbox" onchange="debugging=this.checked;" />Debug?
+      </label>
+      <br />
       <textarea id="textarea" rows="4" cols="50"></textarea>
-     </td>
-     </tr>
-   </table>
-   <!--
-   <pre>
-   Version History
-    - 7/12 Initial Version
-    - 8/12 Debugging enhancements
-   
-   ToDo
-    - graphs to track X,Y position of ball
-   </pre>
-   -->
-   </body>
-   <script type="text/javascript" src="http://dl.dropbox.com/u/675112/pendulum/Box2dWeb-2.1.a.3.min.js"></script>
-   <script type="text/javascript">
-      
-      function init() {
-         var  b2Vec2 = Box2D.Common.Math.b2Vec2
-            , b2AABB = Box2D.Collision.b2AABB
-	    , b2BodyDef = Box2D.Dynamics.b2BodyDef
-	    , b2Body = Box2D.Dynamics.b2Body
-	    , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
-	    , b2Fixture = Box2D.Dynamics.b2Fixture
-	    , b2World = Box2D.Dynamics.b2World
-	    , b2MassData = Box2D.Collision.Shapes.b2MassData
-	    , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-	    , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-	    , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
-            , b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
-	    , b2DistanceJointDef = Box2D.Dynamics.Joints.b2DistanceJointDef
-	    , b2Color = Box2D.Common.b2Color
-            ;
-         
-         var world = new b2World(
-               new b2Vec2(0, 10)    //gravity
-            ,  true                 //allow sleep
-         );
-	 var midX = document.getElementById("canvas").width/2.0;
-	 var midY = document.getElementById("canvas").height/3.0;
 
-	 logger = document.getElementById("textarea");
-	 logger.value = "Double Pendulum\n" +
-	                " Author Sid Ghodke 2011\n" +
-			" Using Box2dWeb";
-	 dataPoints = new Array();
-         
-         var fixDef = new b2FixtureDef;
-         fixDef.density = 1.0;
-         fixDef.friction = 0.5;
-         fixDef.restitution = 0.2;
-         
-         var bodyDef = new b2BodyDef;
-         
-         //create ground
-         bodyDef.type = b2Body.b2_staticBody;
-         fixDef.shape = new b2PolygonShape;
-         fixDef.shape.SetAsBox(20, 2);
-         bodyDef.position.Set(10, 400 / 30 + 1.8);
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
+      <a name="contact"></a>
+      <h3>About</h3>
+      <p>This website was made with pride using <a href="">Box2dWeb</a>, <a href="">Bootstrap</a>, and <a href="">Cubism</a></p>
+      <p>Author: Sid Ghodke</p>
+    </div> <!-- /container -->
 
-         
-         //create some objects
-	 // center joint
-         var pDef = new b2FixtureDef;
-	 pDef.shape = new b2CircleShape(8.0/30);
 
-	 bodyDef.position.x = midX/30;
-	 bodyDef.position.y = midY/30;
-	 var ball0 = world.CreateBody(bodyDef);
-	 ball0.CreateFixture(pDef);
-         
-	 //var make ball 1&2 global 
-	 // remaining masses will be dynamic, with mass
-         bodyDef.type = b2Body.b2_dynamicBody;
-         pDef.friction = 0.3;
-         pDef.density = 3;
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster 
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script> -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/Box2dWeb-2.1.a.3.min.js"></script>
+    <script src="js/d3.v2.js"></script>
+    <script src="js/cubism.v1.js"></script>
+    
+    <script type="text/javascript">
 
-	 bodyDef.position.y = midY/30 * 1.50;
-	 ball1 = world.CreateBody(bodyDef);
-	 ball1.CreateFixture(pDef);
+function random(name) {
+  var value = 0,
+      values = [],
+      i = 0,
+      last;
+  return context.metric(function(start, stop, step, callback) {
+    start = +start, stop = +stop;
+    if (isNaN(last)) last = start;
+    while (last < stop) {
+      last += step;
+      value = Math.max(-10, Math.min(10, value + .8 * Math.random() - .4 + .2 * Math.cos(i += .2)));
+      values.push(value);
+    }
+    callback(null, values = values.slice((start - stop) / step));
+  }, name);
+}
 
-	 bodyDef.position.y = midY/30 * 1.75;
-	 ball2 = world.CreateBody(bodyDef);
-	 ball2.CreateFixture(pDef);
+    var context = cubism.context()
+    .serverDelay(0)
+    .clientDelay(0)
+    .step(1e3)
+    .size(960);
 
-	 //create joints
-	 var distDef = new b2DistanceJointDef();
+    var foo = random("foo"),
+        bar = random("bar");
 
-	 // create first joint
-	 distDef.bodyA = ball0;
-	 distDef.bodyB = ball1;
-	 distDef.length = 3.5;
-	 world.CreateJoint(distDef);
+    d3.select("#example2a").call(function(div) {
+      div.datum(foo);
 
-	 // create second joint
-	 distDef.bodyA = ball1;
-	 distDef.bodyB = ball2;
-	 distDef.length = 2.5;
-	 world.CreateJoint(distDef);
+      div.append("div")
+          .attr("class", "horizon")
+          .call(context.horizon()
+            .height(120)
+            .mode("mirror")
+            .colors(["#bdd7e7","#bae4b3"])
+            .title("Area (120px)")
+            .extent([-10, 10]));
+    });
+    </script>
+    <script type="text/javascript">
+          
+    function init() {
+       var  b2Vec2 = Box2D.Common.Math.b2Vec2
+          , b2AABB = Box2D.Collision.b2AABB
+          , b2BodyDef = Box2D.Dynamics.b2BodyDef
+          , b2Body = Box2D.Dynamics.b2Body
+          , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
+          , b2Fixture = Box2D.Dynamics.b2Fixture
+          , b2World = Box2D.Dynamics.b2World
+          , b2MassData = Box2D.Collision.Shapes.b2MassData
+          , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+          , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+          , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
+          , b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
+          , b2DistanceJointDef = Box2D.Dynamics.Joints.b2DistanceJointDef
+          , b2Color = Box2D.Common.b2Color;
+       
+       var world = new b2World(
+             new b2Vec2(0, 10)    //gravity
+          ,  true                 //allow sleep
+       );
 
-         //setup debug draw -- var
-         debugDraw = new b2DebugDraw();
-			debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
-			debugDraw.SetDrawScale(30.0);
-			debugDraw.SetFillAlpha(0.5);
-			debugDraw.SetLineThickness(1.0);
-			debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-			world.SetDebugDraw(debugDraw);
-         
-         window.setInterval(update, 1000 / 60);
-         window.setInterval(paintTrail, 1000 / 20);
-	 debugging = false;
-         
-         //mouse
-         
-         var mouseX, mouseY, mousePVec, isMouseDown, selectedBody, mouseJoint;
-         var canvasPosition = getElementPosition(document.getElementById("canvas"));
-         
-         document.addEventListener("mousedown", function(e) {
-            isMouseDown = true;
-            handleMouseMove(e);
-            document.addEventListener("mousemove", handleMouseMove, true);
-         }, true);
-         
-         document.addEventListener("mouseup", function() {
-            document.removeEventListener("mousemove", handleMouseMove, true);
-            isMouseDown = false;
-            mouseX = undefined;
-            mouseY = undefined;
-         }, true);
-         
-         function handleMouseMove(e) {
-            mouseX = (e.clientX - canvasPosition.x) / 30;
-            mouseY = (e.clientY - canvasPosition.y) / 30;
-         };
-         
-         function getBodyAtMouse() {
-            mousePVec = new b2Vec2(mouseX, mouseY);
-            var aabb = new b2AABB();
-            aabb.lowerBound.Set(mouseX - 0.001, mouseY - 0.001);
-            aabb.upperBound.Set(mouseX + 0.001, mouseY + 0.001);
-            
-            // Query the world for overlapping shapes.
+       var midX = document.getElementById("canvas").width/2.0;
+       var midY = document.getElementById("canvas").height/3.0;
 
-            selectedBody = null;
-            world.QueryAABB(getBodyCB, aabb);
-            return selectedBody;
-         }
+       logger = document.getElementById("textarea");
+       logger.value = "Double Pendulum\n" +
+                      " Author Sid Ghodke 2011\n" +
+                      " Using Box2dWeb";
+       dataPoints = new Array();
+             
+       var fixDef = new b2FixtureDef;
+       fixDef.density = 1.0;
+       fixDef.friction = 0.5;
+       fixDef.restitution = 0.2;
+       
+       var bodyDef = new b2BodyDef;
+       
+       //create ground
+       bodyDef.type = b2Body.b2_staticBody;
+       fixDef.shape = new b2PolygonShape;
+       fixDef.shape.SetAsBox(20, 2);
+       bodyDef.position.Set(10, 400 / 30 + 1.8);
+       world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-         function getBodyCB(fixture) {
-            if(fixture.GetBody().GetType() != b2Body.b2_staticBody) {
-               if(fixture.GetShape().TestPoint(fixture.GetBody().GetTransform(), mousePVec)) {
-                  selectedBody = fixture.GetBody();
-                  return false;
-               }
-            }
-            return true;
-         }
-         
-         function update() {
-            if(isMouseDown && (!mouseJoint)) {
-               var body = getBodyAtMouse();
-               if(body) {
-                  var md = new b2MouseJointDef();
-                  md.bodyA = world.GetGroundBody();
-                  md.bodyB = body;
-                  md.target.Set(mouseX, mouseY);
-                  md.collideConnected = true;
-                  md.maxForce = 300.0 * body.GetMass();
-                  mouseJoint = world.CreateJoint(md);
-                  body.SetAwake(true);
-               }
-            }
-            
-            if(mouseJoint) {
-               if(isMouseDown) {
-                  mouseJoint.SetTarget(new b2Vec2(mouseX, mouseY));
-               } else {
-                  world.DestroyJoint(mouseJoint);
-                  mouseJoint = null;
-               }
-            }
-         
-            world.Step(1 / 60, 10, 10);
-            world.DrawDebugData();
-            world.ClearForces();
+       //create some objects
+       // center joint
+       var pDef = new b2FixtureDef;
+       pDef.shape = new b2CircleShape(8.0/30);
 
-	    for (var i = 0; i < dataPoints.length; i++) {
-		    debugDraw.DrawCircle(dataPoints[i], 
-				    0.2, new b2Color(11%i,22/i,22));
-	    }
-         };
+       bodyDef.position.x = midX/30;
+       bodyDef.position.y = midY/30;
+       var ball0 = world.CreateBody(bodyDef);
+       ball0.CreateFixture(pDef);
+             
+       //var make ball 1&2 global 
+       // remaining masses will be dynamic, with mass
+       bodyDef.type = b2Body.b2_dynamicBody;
+       pDef.friction = 0.3;
+       pDef.density = 3;
 
-         function paintTrail() {
-            var p = ball2.GetPosition().Copy();
-	    /* 
-             * var p = ball1.GetPosition();
-	     */
-            
-            if (debugging) {
-	      logger.value = 'Ball1 (' + p.x + ',' + p.y + ')\n';
-	      logger.value = logger.value + 'Ball2 (' + p.x + ',' + p.y + ')';
-  
-              logger.value = logger.value + '\n' + dataPoints.length;
-  	    }
+       bodyDef.position.y = midY/30 * 1.50;
+       ball1 = world.CreateBody(bodyDef);
+       ball1.CreateFixture(pDef);
 
-	    dataPoints.push(p);
+       bodyDef.position.y = midY/30 * 1.75;
+       ball2 = world.CreateBody(bodyDef);
+       ball2.CreateFixture(pDef);
 
-	    if (dataPoints.length > 150) {
-		    dataPoints.splice(0, 2);
-	    }
-         };
-         
-         //helpers
-         
-         //http://js-tut.aardon.de/js-tut/tutorial/position.html
-         function getElementPosition(element) {
-            var elem=element, tagname="", x=0, y=0;
+       //create joints
+       var distDef = new b2DistanceJointDef();
+
+       // create first joint
+       distDef.bodyA = ball0;
+       distDef.bodyB = ball1;
+       distDef.length = 3.5;
+       world.CreateJoint(distDef);
+
+       // create second joint
+       distDef.bodyA = ball1;
+       distDef.bodyB = ball2;
+       distDef.length = 2.5;
+       world.CreateJoint(distDef);
+
+           //setup debug draw -- var
+       debugDraw = new b2DebugDraw();
+       debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
+       debugDraw.SetDrawScale(30.0);
+       debugDraw.SetFillAlpha(0.5);
+       debugDraw.SetLineThickness(1.0);
+       debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+       world.SetDebugDraw(debugDraw);
            
-            while((typeof(elem) == "object") && (typeof(elem.tagName) != "undefined")) {
-               y += elem.offsetTop;
-               x += elem.offsetLeft;
-               tagname = elem.tagName.toUpperCase();
+           window.setInterval(update, 1000 / 60);
+           window.setInterval(paintTrail, 1000 / 20);
+          debugging = false;
+             
+             //mouse
+             
+             var mouseX, mouseY, mousePVec, isMouseDown, selectedBody, mouseJoint;
+             var canvasPosition = getElementPosition(document.getElementById("canvas"));
+             
+             document.addEventListener("mousedown", function(e) {
+                isMouseDown = true;
+                handleMouseMove(e);
+                document.addEventListener("mousemove", handleMouseMove, true);
+             }, true);
+             
+             document.addEventListener("mouseup", function() {
+                document.removeEventListener("mousemove", handleMouseMove, true);
+                isMouseDown = false;
+                mouseX = undefined;
+                mouseY = undefined;
+             }, true);
+             
+             function handleMouseMove(e) {
+                mouseX = (e.clientX - canvasPosition.x) / 30;
+                mouseY = (e.clientY - canvasPosition.y) / 30;
+             };
+             
+             function getBodyAtMouse() {
+                mousePVec = new b2Vec2(mouseX, mouseY);
+                var aabb = new b2AABB();
+                aabb.lowerBound.Set(mouseX - 0.001, mouseY - 0.001);
+                aabb.upperBound.Set(mouseX + 0.001, mouseY + 0.001);
+                
+                // Query the world for overlapping shapes.
 
-               if(tagname == "BODY")
-                  elem=0;
+                selectedBody = null;
+                world.QueryAABB(getBodyCB, aabb);
+                return selectedBody;
+             }
 
-               if(typeof(elem) == "object") {
-                  if(typeof(elem.offsetParent) == "object")
-                     elem = elem.offsetParent;
-               }
+             function getBodyCB(fixture) {
+                if(fixture.GetBody().GetType() != b2Body.b2_staticBody) {
+                   if(fixture.GetShape().TestPoint(fixture.GetBody().GetTransform(), mousePVec)) {
+                      selectedBody = fixture.GetBody();
+                      return false;
+                   }
+                }
+                return true;
+             }
+             
+             function update() {
+                if(isMouseDown && (!mouseJoint)) {
+                   var body = getBodyAtMouse();
+                   if(body) {
+                      var md = new b2MouseJointDef();
+                      md.bodyA = world.GetGroundBody();
+                      md.bodyB = body;
+                      md.target.Set(mouseX, mouseY);
+                      md.collideConnected = true;
+                      md.maxForce = 300.0 * body.GetMass();
+                      mouseJoint = world.CreateJoint(md);
+                      body.SetAwake(true);
+                   }
+                }
+                
+                if(mouseJoint) {
+                   if(isMouseDown) {
+                      mouseJoint.SetTarget(new b2Vec2(mouseX, mouseY));
+                   } else {
+                      world.DestroyJoint(mouseJoint);
+                      mouseJoint = null;
+                   }
+                }
+             
+                world.Step(1 / 60, 10, 10);
+                world.DrawDebugData();
+                world.ClearForces();
+
+          for (var i = 0; i < dataPoints.length; i++) {
+            debugDraw.DrawCircle(dataPoints[i], 
+                0.2, new b2Color(11%i,22/i,22));
+          }
+             };
+
+             function paintTrail() {
+                var p = ball2.GetPosition().Copy();
+          /* 
+                 * var p = ball1.GetPosition();
+           */
+                
+                if (debugging) {
+            logger.value = 'Ball1 (' + p.x + ',' + p.y + ')\n';
+            logger.value = logger.value + 'Ball2 (' + p.x + ',' + p.y + ')';
+      
+                  logger.value = logger.value + '\n' + dataPoints.length;
             }
 
-            return {x: x, y: y};
-         }
+          dataPoints.push(p);
+
+          if (dataPoints.length > 150) {
+            dataPoints.splice(0, 2);
+          }
+             };
+             
+             //helpers
+             
+             //http://js-tut.aardon.de/js-tut/tutorial/position.html
+             function getElementPosition(element) {
+                var elem=element, tagname="", x=0, y=0;
+               
+                while((typeof(elem) == "object") && (typeof(elem.tagName) != "undefined")) {
+                   y += elem.offsetTop;
+                   x += elem.offsetLeft;
+                   tagname = elem.tagName.toUpperCase();
+
+                   if(tagname == "BODY")
+                      elem=0;
+
+                   if(typeof(elem) == "object") {
+                      if(typeof(elem.offsetParent) == "object")
+                         elem = elem.offsetParent;
+                   }
+                }
+
+                return {x: x, y: y};
+             }
 
 
       };
-   
-   </script>
-   
-   
+      </script>
+
+  </body>
 </html>
